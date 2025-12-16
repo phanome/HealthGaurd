@@ -581,4 +581,3 @@ ${message}
     return res.status(500).json({ error: "Symptom check failed" });
   }
 };
-jzbbjs
