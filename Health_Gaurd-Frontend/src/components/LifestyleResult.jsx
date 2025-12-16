@@ -1,14 +1,22 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { FileBarChart, Salad, Dumbbell, Leaf, ShieldAlert, Info } from "lucide-react";
+import {
+  FileBarChart,
+  Salad,
+  Dumbbell,
+  Leaf,
+  ShieldAlert,
+  Info
+} from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const card = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 }
 };
 
-export default function LifestyleResult({ data }) {
+export default function LifestyleResult({ data = {} }) {
   const sections = [
     {
       title: "Health Summary",
@@ -67,13 +75,27 @@ export default function LifestyleResult({ data }) {
           variants={card}
           className={`p-6 rounded-xl shadow border ${sec.bg}`}
         >
-          <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center gap-3 mb-4">
             <sec.icon className={`w-6 h-6 ${sec.color}`} />
             <h2 className="text-xl font-semibold">{sec.title}</h2>
           </div>
 
-          <ReactMarkdown className="prose prose-slate">
-            {sec.text || "No data available."}
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            className="prose prose-slate max-w-none"
+            components={{
+              table: ({ node, ...props }) => (
+                <table className="border border-slate-300 w-full" {...props} />
+              ),
+              th: ({ node, ...props }) => (
+                <th className="border border-slate-300 bg-slate-200 px-3 py-2 text-left" {...props} />
+              ),
+              td: ({ node, ...props }) => (
+                <td className="border border-slate-300 px-3 py-2 align-top" {...props} />
+              )
+            }}
+          >
+            {sec.text?.trim() || "_No data available._"}
           </ReactMarkdown>
         </motion.div>
       ))}

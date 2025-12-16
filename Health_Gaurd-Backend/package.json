@@ -23,6 +23,7 @@
     "openai": "^4.104.0",
     "pdf-parse": "^1.1.1",
     "pdf-parse-fixed": "^1.1.1",
+    "pdf-poppler": "^0.2.3",
     "tesseract.js": "^6.0.1"
   },
   "devDependencies": {

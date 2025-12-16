@@ -18,7 +18,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load .env file (project root)
-dotenv.config({ path: path.join(__dirname, "../.env") });
+dotenv.config();
+
 
 // ---------------------
 // ENVIRONMENT CHECKS
@@ -33,7 +34,6 @@ console.log("FRONTEND_ORIGIN:", FRONTEND_ORIGIN);
 
 // Init app
 const app = express();
-
 // ----------------- MIDDLEWARE -----------------
 app.use(morgan("dev"));
 

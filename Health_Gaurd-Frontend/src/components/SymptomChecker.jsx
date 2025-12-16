@@ -19,87 +19,102 @@ export default function SymptomChecker() {
     setError("");
 
     if (!navigator.geolocation) {
-      alert("Geolocation not supported.");
+      setError("Geolocation not supported by this browser.");
       setLocLoading(false);
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
+        const { latitude, longitude } = pos.coords;
 
         try {
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+            {
+              headers: {
+                "User-Agent": "HealthGuardAI/1.0",
+              },
+            }
           );
+
           const data = await res.json();
 
           setLocation({
-            city: data.address.city || data.address.town || data.address.village || "",
-            state: data.address.state || "",
-            country: data.address.country || "",
+            city:
+              data.address?.city ||
+              data.address?.town ||
+              data.address?.village ||
+              "",
+            state: data.address?.state || "",
+            country: data.address?.country || "",
           });
-        } catch {
-          alert("Failed to detect location.");
+        } catch (err) {
+          console.error("Location error:", err);
+          setError("Failed to detect location.");
+        } finally {
+          setLocLoading(false);
         }
-
-        setLocLoading(false);
       },
       () => {
-        alert("Location permission denied.");
+        setError("Location permission denied.");
         setLocLoading(false);
       }
     );
   };
 
   // ---------------------------------------
-  // SEND MESSAGE TO API
+  // 🚀 SEND MESSAGE TO API
   // ---------------------------------------
   const sendMessage = async () => {
-    if (!input.trim()) return;
+  if (!input.trim()) return;
 
-    setError("");
-    setStructured(null);
+  setError("");
+  setStructured(null);
 
-    let msg = input;
-    if (location) {
-      msg += `\n\nUser Location: ${location.city}, ${location.state}, ${location.country}`;
+  let msg = input.trim();
+  if (location) {
+    msg += `\n\nUser Location: ${location.city}, ${location.state}, ${location.country}`;
+  }
+
+  const newHistory = [...history, { role: "user", content: msg }];
+  setHistory(newHistory);
+
+  try {
+    setLoading(true);
+
+    const res = await api.post("/ai/symptom-checker", {
+      message: msg,
+      history: newHistory,
+    });
+
+    const payload = res.data?.response || res.data;
+
+    if (payload?.error) {
+      setError(payload.error);
+      return;
     }
 
-    const newHistory = [...history, { role: "user", content: msg }];
-    setHistory(newHistory);
-
-    try {
-      setLoading(true);
-
-      const res = await api.post("/ai/symptom-checker", {
-        message: msg,
-        history: newHistory,
-      });
-
-      if (!res.data?.response) {
-        throw new Error("Invalid AI response");
-      }
-
-      setStructured(res.data.response);
-
-      setHistory((prev) => [
-        ...prev,
-        { role: "assistant", content: "[structured_result]" },
-      ]);
-
-      setInput("");
-    } catch (err) {
-      console.error(err);
-      setError("❌ Failed to analyze symptoms.");
-    } finally {
-      setLoading(false);
+    if (!payload || !Array.isArray(payload.conditions)) {
+      console.warn("Bad AI response:", JSON.stringify(res.data, null, 2));
+      setError("⚠️ AI response was unclear. Try again.");
+      return;
     }
-  };
+
+    setStructured(payload);
+    setInput("");
+  } catch (err) {
+    console.error(err);
+    setError("❌ Failed to analyze symptoms.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   // ---------------------------------------
-  // UI
+  // 🎨 UI
   // ---------------------------------------
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
@@ -108,7 +123,7 @@ export default function SymptomChecker() {
       <button
         onClick={getLocation}
         disabled={locLoading}
-        className="mb-3 bg-green-600 text-white px-4 py-2 rounded"
+        className="mb-3 bg-green-600 text-white px-4 py-2 rounded disabled:opacity-60"
       >
         {locLoading ? "Detecting..." : "📍 Use My Location"}
       </button>

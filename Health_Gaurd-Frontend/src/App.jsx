@@ -21,10 +21,33 @@ export default function App() {
         {/* ================= PUBLIC ROUTES ================= */}
         <Route path="/" element={<Home />} />
 
-        {/* ================= PUBLIC FEATURE ROUTES ================= */}
-        <Route path="/symptom-checker" element={<SymptomChecker />} />
-        <Route path="/lifestyle-enhancer" element={<LifestyleEnhancer />} />
-        <Route path="/lifestyle-result" element={<LifestyleResult />} />
+        {/* ================= PROTECTED FEATURE ROUTES ================= */}
+        <Route
+          path="/symptom-checker"
+          element={
+            <ProtectedRoute>
+              <SymptomChecker />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/lifestyle-enhancer"
+          element={
+            <ProtectedRoute>
+              <LifestyleEnhancer />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/lifestyle-result"
+          element={
+            <ProtectedRoute>
+              <LifestyleResult />
+            </ProtectedRoute>
+          }
+        />
 
         {/* ================= REDIRECT WRONG / OLD ROUTES ================= */}
         <Route
