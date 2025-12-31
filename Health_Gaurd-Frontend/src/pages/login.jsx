@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import api from "../api/api";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
@@ -36,40 +37,53 @@ export default function Login() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-20 p-6 bg-white shadow rounded">
-      <h2 className="text-2xl font-semibold mb-4">Login</h2>
+  <div className="max-w-md mx-auto mt-20 p-6 bg-white shadow rounded">
+    <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
 
-      <form onSubmit={handleLogin} className="space-y-4">
-        <input
-          type="email"
-          placeholder="Email"
-          className="input w-full"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="email"
-          required
-        />
+    <form onSubmit={handleLogin} className="space-y-4">
+      <input
+        type="email"
+        placeholder="Email"
+        className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        autoComplete="email"
+        required
+      />
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="input w-full"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-          required
-        />
+      <input
+        type="password"
+        placeholder="Password"
+        className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        autoComplete="current-password"
+        required
+      />
 
-        {error && <p className="text-red-600 text-sm">{error}</p>}
+      {error && (
+        <p className="text-red-600 text-sm text-center">{error}</p>
+      )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-indigo-600 text-white py-2 rounded"
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition"
+      >
+        {loading ? "Logging in..." : "Login"}
+      </button>
+
+      {/* SIGN UP LINK */}
+      <p className="text-sm text-center mt-4">
+        Don’t have an account?{" "}
+        <Link
+          to="/signup"
+          className="text-indigo-600 hover:underline font-medium"
         >
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
-    </div>
-  );
+          Sign up
+        </Link>
+      </p>
+    </form>
+  </div>
+);
 }
