@@ -40,7 +40,7 @@ app.use(morgan("dev"));
 // CORS (supports cookies for frontend)
 app.use(
   cors({
-    origin: FRONTEND_ORIGIN,
+    origin: true, // Allow all origins for mobile development
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
@@ -93,9 +93,10 @@ const PORT = process.env.PORT || 8080;
 const startServer = async () => {
   await connectDB();
 
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running at http://localhost:${PORT}`);
-    console.log(`🌐 CORS allowed: ${FRONTEND_ORIGIN}`);
+  // Listen on 0.0.0.0 to allow access from other devices on the network
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 Server running at http://0.0.0.0:${PORT}`);
+    console.log(`🌐 CORS allowed: ALL`);
     console.log("🔥 Fireworks AI Integration Active");
   });
 };
